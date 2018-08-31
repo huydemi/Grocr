@@ -61,8 +61,23 @@ class GroceryListTableViewController: UITableViewController {
     
     user = User(uid: "FakeId", email: "hungry@person.food")
     
+    // 1
     ref.observe(.value, with: { snapshot in
-      print(snapshot.value as Any)
+      // 2
+      var newItems: [GroceryItem] = []
+      
+      // 3
+      for child in snapshot.children {
+        // 4
+        if let snapshot = child as? DataSnapshot,
+          let groceryItem = GroceryItem(snapshot: snapshot) {
+          newItems.append(groceryItem)
+        }
+      }
+      
+      // 5
+      self.items = newItems
+      self.tableView.reloadData()
     })
   }
   
@@ -90,8 +105,8 @@ class GroceryListTableViewController: UITableViewController {
   
   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
-      items.remove(at: indexPath.row)
-      tableView.reloadData()
+      let groceryItem = items[indexPath.row]
+      groceryItem.ref?.removeValue()
     }
   }
   
