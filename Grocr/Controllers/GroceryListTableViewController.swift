@@ -39,6 +39,7 @@ class GroceryListTableViewController: UITableViewController {
   var user: User!
   var userCountBarButtonItem: UIBarButtonItem!
   
+  let ref = Database.database().reference(withPath: "grocery-items")
   
   override var preferredStatusBarStyle: UIStatusBarStyle {
     return .lightContent
@@ -59,6 +60,10 @@ class GroceryListTableViewController: UITableViewController {
     navigationItem.leftBarButtonItem = userCountBarButtonItem
     
     user = User(uid: "FakeId", email: "hungry@person.food")
+    
+    ref.observe(.value, with: { snapshot in
+      print(snapshot.value as Any)
+    })
   }
   
   // MARK: UITableView Delegate methods
@@ -120,14 +125,19 @@ class GroceryListTableViewController: UITableViewController {
                                   preferredStyle: .alert)
     
     let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
-      let textField = alert.textFields![0]
+        // 1
+        guard let textField = alert.textFields?.first,
+          let text = textField.text else { return }
       
-      let groceryItem = GroceryItem(name: textField.text!,
-                                    addedByUser: self.user.email,
-                                    completed: false)
+        // 2
+        let groceryItem = GroceryItem(name: text,
+                                      addedByUser: self.user.email,
+                                      completed: false)
+        // 3
+        let groceryItemRef = self.ref.child(text.lowercased())
       
-      self.items.append(groceryItem)
-      self.tableView.reloadData()
+        // 4
+        groceryItemRef.setValue(groceryItem.toAnyObject())
     }
     
     let cancelAction = UIAlertAction(title: "Cancel",
