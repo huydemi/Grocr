@@ -111,13 +111,18 @@ class GroceryListTableViewController: UITableViewController {
   }
   
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    // 1
     guard let cell = tableView.cellForRow(at: indexPath) else { return }
-    var groceryItem = items[indexPath.row]
+    // 2
+    let groceryItem = items[indexPath.row]
+    // 3
     let toggledCompletion = !groceryItem.completed
-    
+    // 4
     toggleCellCheckbox(cell, isCompleted: toggledCompletion)
-    groceryItem.completed = toggledCompletion
-    tableView.reloadData()
+    // 5
+    groceryItem.ref?.updateChildValues([
+      "completed": toggledCompletion
+      ])
   }
   
   func toggleCellCheckbox(_ cell: UITableViewCell, isCompleted: Bool) {
