@@ -63,6 +63,26 @@ class OnlineUsersTableViewController: UITableViewController {
   // MARK: Actions
   
   @IBAction func signoutButtonPressed(_ sender: AnyObject) {
-    dismiss(animated: true, completion: nil)
+    // 1
+    let user = Auth.auth().currentUser!
+    let onlineRef = Database.database().reference(withPath: "online/\(user.uid)")
+    
+    // 2
+    onlineRef.removeValue { (error, _) in
+      
+      // 3
+      if let error = error {
+        print("Removing online failed: \(error)")
+        return
+      }
+      
+      // 4
+      do {
+        try Auth.auth().signOut()
+        self.dismiss(animated: true, completion: nil)
+      } catch (let error) {
+        print("Auth sign out failed: \(error)")
+      }
+    }
   }
 }
