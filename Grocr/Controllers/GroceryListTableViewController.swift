@@ -61,21 +61,15 @@ class GroceryListTableViewController: UITableViewController {
     
     user = User(uid: "FakeId", email: "hungry@person.food")
     
-    // 1
-    ref.observe(.value, with: { snapshot in
-      // 2
+    ref.queryOrdered(byChild: "completed").observe(.value, with: { snapshot in
       var newItems: [GroceryItem] = []
-      
-      // 3
       for child in snapshot.children {
-        // 4
         if let snapshot = child as? DataSnapshot,
           let groceryItem = GroceryItem(snapshot: snapshot) {
           newItems.append(groceryItem)
         }
       }
       
-      // 5
       self.items = newItems
       self.tableView.reloadData()
     })
